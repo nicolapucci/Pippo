@@ -1,0 +1,58 @@
+services:
+- STT
+- TTS
+- NLU_Router -> reads the transcription of the user's sentence and identify the type (chat / action) and the relative metadatas, perform also the first line of filtering (allowed topics, non clear request ecc.)
+- RAG -> reate the context needed to answer the user's query (chat case) using the local collections and/or web search
+- Action_handler -> performs the action based ont he metadatas extracted from the NLU_Router
+- Ollama -> Provides small and medium LLM, to the other services
+- Server -> Orchestrate the other services
+- Postgresql -> persistent db
+- Redis -> Session db and caching
+
+flow:
+    user's request
+    |
+    v
+    STT
+    |
+    v 
+    NLU_Router: 
+        if chat (1)
+        elif action (2)
+        else fallback (3)
+
+1) Chat flow:
+
+    Query
+    |
+    v
+    RAG
+    |
+    v
+    LLM / answer
+    |
+    v
+    TTS
+    |
+    v
+    response
+
+2) Action flow:
+
+    Command
+    |
+    v
+    Action_handler / perform action and generate a brief response feedback if needed
+    |
+    v
+    TTS / only if Action_handler returns a response
+    |
+    v
+    response
+
+3) Fallback:
+
+    TTS / syntetize something based on the NLU_Router output (eg. if NLU_Router router choose the fallback due to unallowed topics we tell the user 'sorry i'm not authorized to talk about this topic')
+    |
+    v
+    response

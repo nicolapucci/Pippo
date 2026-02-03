@@ -1,0 +1,26 @@
+roles:
+    semantic_search
+    web_search
+    judge (maybe change the name to better claryfy his role) -> he will evaluate the context provided by semantic_search or web_search, and if insufficent he will also return some data about the missing topics
+    query_generator -> he will write the queries for web_search and semantic_search
+    cleaner -> he will 'clean' all the data retrieved by semantic_search and web_search
+
+
+RAG flow:
+
+1)  query
+    |
+    v
+2)  query_generator / optimize the provided query/ies for the relative search
+    |
+    v
+3)  semantic_search and/or web_search / if the tpoic isn't in my collections i use the web_search
+    |
+    v
+4)  cleaner / removes the unnecessary and duplicate data from the context
+    |
+    v
+5)  judge / if judge evaluate the context as not sufficent to answer, he will generate some queries about the missing info and go back to 2), there is a max number of times this cicle can be executed
+    |
+    v
+6)  returns the context if he passed the judge, else use all the previous contexts to extrapolad all the possible data and return the result
